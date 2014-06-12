@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">My Application</string>
+    <string name="startButtonText">Connect</string>
+    <string name="endButtonText">Disconnect</string>
+    <string name="startMeasureButtonText">Start Measuring</string>
+    <string name="endMeasureButtonText">End Measuring</string>
+    <string name="saveButtonText">Save</string>
+    <string name="startLoggingButtonText">Start Logging</string>
+    <string name="stopLoggingButtonText">Stop Logging</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+</resources>

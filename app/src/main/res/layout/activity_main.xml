@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_weight="8"
+        android:layout_height="0dp">
+
+        <TextView android:id="@+id/log_message"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="24sp"/>
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp">
+
+        <Button
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/startButtonText"
+            android:id="@+id/start_button"
+            android:onClick="connectClick"/>
+
+        <Button
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/endButtonText"
+            android:id="@+id/end_button" />
+
+        <Button
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/saveButtonText"
+            android:id="@+id/save_button" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp">
+
+        <Button
+            android:layout_weight = "1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/startLoggingButtonText"
+            android:id="@+id/start_log_button"
+            android:onClick="startLogging"/>
+
+        <Button
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/stopLoggingButtonText"
+            android:id="@+id/end_log_button" />
+
+    </LinearLayout>
+</LinearLayout>
