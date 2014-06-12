@@ -8,14 +8,18 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
 
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 
 public class MainActivity extends ActionBarActivity {
 
     Boolean logging;
 
-    Socket clientSocket;
+    Socket clientSocket = null;
+    DataInputStream in = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +60,23 @@ public class MainActivity extends ActionBarActivity {
     {
         TextView logText = (TextView) findViewById(R.id.log_message);
         logText.append(String.format("Connecting to device...%n"));
+        try {
+            clientSocket = new Socket("10.61.44.108", 2222);
+
+        }
+        catch (IOException e)
+        {
+            System.out.printf(e.toString() + "%n");
+        }
+        /*catch (SocketException e)
+        {
+            System.out.printf(e.toString() + "%n");
+        }*/
         ((Button) findViewById(R.id.start_button)).setEnabled(false);
         ((Button) findViewById(R.id.end_button)).setEnabled(true);
         ((Button) findViewById(R.id.save_button)).setEnabled(true);
         ((Button) findViewById(R.id.start_log_button)).setEnabled(true);
-        ((Button) findViewById(R.id.end_log_button)).setEnabled(true);
+       // ((Button) findViewById(R.id.end_log_button)).setEnabled(true);
 
     }
     public void startLogging(View view)
