@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">My Application</string>
+    <string name="app_name">AIONAV Logging</string>
     <string name="startButtonText">Connect</string>
     <string name="endButtonText">Disconnect</string>
     <string name="startMeasureButtonText">Start Measuring</string>

@@ -10,14 +10,16 @@ import android.widget.Button;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 
 
 public class MainActivity extends ActionBarActivity {
 
     Boolean logging;
-
+    Boolean connecting;
     Socket clientSocket = null;
     DataInputStream in = null;
 
@@ -56,18 +58,44 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void connectClick(View view)
+    public void connectClick(View view) throws InterruptedException
     {
-        TextView logText = (TextView) findViewById(R.id.log_message);
+        /* For initial connection to AIONAV application on Windows */
+        final TextView logText = (TextView) findViewById(R.id.log_message);
         logText.append(String.format("Connecting to device...%n"));
-        try {
-            clientSocket = new Socket("10.61.44.108", 2222);
+        System.out.println("About to connect");
+        connecting = true;
+        Runnable runnable = new Runnable() {
+            public void run() {
+                System.out.println("TESTING");
 
-        }
-        catch (IOException e)
-        {
-            System.out.printf(e.toString() + "%n");
-        }
+                /* While until finding connection */
+                while (connecting) {
+                    try {
+                        int timeout = 3000;
+                        int port = 2222;
+                        String addr = "localhost";
+                        System.out.println("Before the socket!");
+                        InetSocketAddress inetAddr = new InetSocketAddress(addr, port);
+                        clientSocket.connect(inetAddr, timeout);
+                        connecting = false;
+                    } catch (UnknownHostException e2) {
+                        System.out.println("Unknown host");
+                    } catch (Exception e) {
+                        try {
+                            Thread.sleep(1000);
+                        }
+                        catch (Exception threadException){
+
+                        }
+                        // logText.append(String.format("Still not connected...%n"));
+                    }
+                }
+            }
+        };
+        Thread myThread = new Thread(runnable);
+        myThread.start();
+        System.out.println("Testing again!");
         /*catch (SocketException e)
         {
             System.out.printf(e.toString() + "%n");
