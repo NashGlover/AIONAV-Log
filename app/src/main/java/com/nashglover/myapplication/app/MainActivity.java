@@ -1,5 +1,6 @@
 package com.nashglover.myapplication.app;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,20 +9,17 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
 
-import java.io.DataInputStream;
+import java.net.ServerSocket;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 
 
 public class MainActivity extends ActionBarActivity {
 
+    TextView logText;
     Boolean logging;
     Boolean connecting;
-    Socket clientSocket = null;
-    DataInputStream in = null;
+    ServerSocket listener = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +33,7 @@ public class MainActivity extends ActionBarActivity {
         saveButton.setEnabled(false);
         startLogButton.setEnabled(false);
         endLogButton.setEnabled(false);
+        logText = (TextView) findViewById(R.id.log_message);
     }
 
 
@@ -58,10 +57,21 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    public void disconnectClick(View view)
+    {
+        try {
+            listener.close();
+        }
+        catch (IOException e)
+        {
+            e.getMessage();
+        }
+    }
+
     public void connectClick(View view) throws InterruptedException
     {
         /* For initial connection to AIONAV application on Windows */
-        final TextView logText = (TextView) findViewById(R.id.log_message);
         logText.append(String.format("Connecting to device...%n"));
         System.out.println("About to connect");
         connecting = true;
@@ -70,27 +80,23 @@ public class MainActivity extends ActionBarActivity {
                 System.out.println("TESTING");
 
                 /* While until finding connection */
-                while (connecting) {
                     try {
                         int timeout = 3000;
-                        int port = 2222;
+                        int port = 5553;
                         String addr = "localhost";
                         System.out.println("Before the socket!");
-                        InetSocketAddress inetAddr = new InetSocketAddress(addr, port);
-                        clientSocket.connect(inetAddr, timeout);
+                        //InetSocketAddress inetAddr = new InetSocketAddress(addr, port);
+                        listener = new ServerSocket(port);
+                        listener.accept();
+                        System.out.println("After the socket");
+                        //logText.append(String.format("Connected!%n"));
                         connecting = false;
-                    } catch (UnknownHostException e2) {
+                    } catch (UnknownHostException e) {
                         System.out.println("Unknown host");
-                    } catch (Exception e) {
-                        try {
-                            Thread.sleep(1000);
-                        }
-                        catch (Exception threadException){
-
-                        }
                         // logText.append(String.format("Still not connected...%n"));
+                    } catch (IOException ioException) {
+                        System.out.println(ioException.getMessage());
                     }
-                }
             }
         };
         Thread myThread = new Thread(runnable);
@@ -100,18 +106,24 @@ public class MainActivity extends ActionBarActivity {
         {
             System.out.printf(e.toString() + "%n");
         }*/
-        ((Button) findViewById(R.id.start_button)).setEnabled(false);
-        ((Button) findViewById(R.id.end_button)).setEnabled(true);
-        ((Button) findViewById(R.id.save_button)).setEnabled(true);
-        ((Button) findViewById(R.id.start_log_button)).setEnabled(true);
+        (findViewById(R.id.start_button)).setEnabled(false);
+        (findViewById(R.id.end_button)).setEnabled(true);
+        (findViewById(R.id.save_button)).setEnabled(true);
+        (findViewById(R.id.start_log_button)).setEnabled(true);
        // ((Button) findViewById(R.id.end_log_button)).setEnabled(true);
 
     }
+
+    public void addToLog(String newMessage)
+    {
+
+    }
+
     public void startLogging(View view)
     {
         /*LoggingThread logThread = new LoggingThread();
         logThread.run();*/
-        logging = true;
+       /* logging = true;
 
         Runnable runnable = new Runnable() {
             public void run() {
@@ -125,16 +137,19 @@ public class MainActivity extends ActionBarActivity {
                                 logText.append(String.format("Stuff%n"));
                             }
                         });
-                        Thread.sleep(1000);
+                        Thread.sleep(300);
                     }
-                    catch (Exception e)
+                    catch (InterruptedException e)
                     {
+                        System.out.println(e.getMessage());
                     }
                 }
             }
         };
         Thread myThread = new Thread(runnable);
-        myThread.start();
+        myThread.start();*/
+        Intent i = new Intent(this, LoggingThread.class);
+        startService(i);
     }
 
 }

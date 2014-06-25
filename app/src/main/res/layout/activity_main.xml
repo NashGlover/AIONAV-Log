@@ -9,11 +9,19 @@
         android:layout_width="match_parent"
         android:layout_weight="8"
         android:layout_height="0dp">
-
-        <TextView android:id="@+id/log_message"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="24sp"/>
+            >
+
+            <TextView android:id="@+id/log_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:scrollbars="vertical"
+                android:layout_gravity="bottom"/>
+
+            </ScrollView>
 
         </LinearLayout>
 
