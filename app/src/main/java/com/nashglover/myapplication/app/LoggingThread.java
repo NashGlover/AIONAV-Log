@@ -38,7 +38,7 @@ public class LoggingThread extends IntentService {
             listener.accept();
         }
         catch (SocketTimeoutException timeout) {
-            
+            System.out.println("Hello");
         }
         catch (IOException e) {
             System.out.println(e.getMessage());
