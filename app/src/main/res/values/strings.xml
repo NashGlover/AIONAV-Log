@@ -11,5 +11,7 @@
     <string name="stopLoggingButtonText">Stop Logging</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="ip_text">IP Address:</string>
+    <string name="submit_ip_text">Submit</string>
 
 </resources>
