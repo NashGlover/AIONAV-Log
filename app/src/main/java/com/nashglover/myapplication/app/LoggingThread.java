@@ -28,26 +28,26 @@ public class LoggingThread extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent){
-
+        connectToApp();
     }
 
     public void connectToApp(){
-        try {
-            listener = new ServerSocket(2222);
-            listener.setSoTimeout(15000);
-            listener.accept();
+        /*try {
+            //listener = new ServerSocket(2222);
+            //listener.setSoTimeout(2000);
+            //listener.accept();
         }
-        catch (SocketTimeoutException timeout) {
+        /*catch (SocketTimeoutException timeout) {
             System.out.println("Hello");
         }
         catch (IOException e) {
             System.out.println(e.getMessage());
-        }
+        }*/
     }
 
-    public LoggingThread()
-    {
+    public LoggingThread(ServerSocket _listener) {
         super("LoggingThread");
+        listener = _listener;
     }
 
     public void run()
