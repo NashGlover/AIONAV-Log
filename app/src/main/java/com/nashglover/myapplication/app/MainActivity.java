@@ -65,6 +65,20 @@ public class MainActivity extends ActionBarActivity {
         logging = new AtomicBoolean();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        System.out.println("Activity has been stopped!");
+    }
+
+    @Override
+    protected void onDestroy() {
+      //  super.onDestroy();
+
+        System.out.println("Activity has been destroyed!");
+        super.onDestroy();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -90,27 +104,30 @@ public class MainActivity extends ActionBarActivity {
     public void disconnectClick(View view)
     {
         try {
+            listener.close();
+            System.out.println("Listener closed.");
             anotherSocket.shutdownInput();
             anotherSocket.shutdownOutput();
             anotherSocket.close();
-            listener.close();
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    logging.set(false);
-                    logText.append(String.format("Disconnected%n"));
-                    logScroll.fullScroll(View.FOCUS_DOWN);
-                    startLogButton.setEnabled(false);
-                    endLogButton.setEnabled(false);
-                    connectButton.setEnabled(true);
-                    endButton.setEnabled(false);
-                    count++;
-                }
-            });
         }
         catch (IOException e)
         {
-            e.getMessage();
+            System.out.println("EXCEPTION:");
+            System.out.println(e.getMessage());
         }
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+                logging.set(false);
+                logText.append(String.format("Disconnected%n"));
+                logScroll.fullScroll(View.FOCUS_DOWN);
+                startLogButton.setEnabled(false);
+                endLogButton.setEnabled(false);
+                connectButton.setEnabled(true);
+                endButton.setEnabled(false);
+                count++;
+            }
+        });
     }
 
     public void stopLogging(View view)
