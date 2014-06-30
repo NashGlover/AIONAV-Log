@@ -34,7 +34,7 @@ public class MainActivity extends ActionBarActivity {
     Button endLogButton;
     Button connectButton;
 
-    AtomicBoolean logging;
+    AtomicBoolean tracking;
     Boolean connecting;
     ServerSocket listener;
     Socket anotherSocket;
@@ -62,7 +62,7 @@ public class MainActivity extends ActionBarActivity {
         endLogButton.setEnabled(false);
         logText = (TextView) findViewById(R.id.log_message);
         logScroll = (ScrollView) findViewById(R.id.log_scroll);
-        logging = new AtomicBoolean();
+        tracking = new AtomicBoolean();
     }
 
     @Override
@@ -118,7 +118,7 @@ public class MainActivity extends ActionBarActivity {
 
         runOnUiThread(new Runnable() {
             public void run() {
-                logging.set(false);
+                tracking.set(false);
                 logText.append(String.format("Disconnected%n"));
                 logScroll.fullScroll(View.FOCUS_DOWN);
                 startLogButton.setEnabled(false);
@@ -132,7 +132,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void stopLogging(View view)
     {
-        logging.set(false);
+        tracking.set(false);
         runOnUiThread(new Runnable() {
             public void run() {
                 logText.append(String.format("Stopped Logging%n"));
@@ -170,6 +170,7 @@ public class MainActivity extends ActionBarActivity {
                         }
                         listener = new ServerSocket(2222);
                         anotherSocket = new Socket();
+                        //anotherSocket.setSoTimeout(10000);
                         anotherSocket = listener.accept();
                         runOnUiThread(new Runnable() {
                             public void run() {
@@ -218,7 +219,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void startLogging(View view)
     {
-        System.out.println("Pressed start logging");
+        System.out.println("Pressed start tracking");
         Runnable runnable = new Runnable() {
             public void run() {
                 runOnUiThread(new Runnable() {
@@ -233,9 +234,9 @@ public class MainActivity extends ActionBarActivity {
                 long device1, device2;
                 long timestamp = 0;
                 double longitude, latitude, altitude;
-                logging.set(true);
+                tracking.set(true);
                 double x, y, z;
-                while (logging.get()) {
+                while (tracking.get()) {
                     try {
                         in = new DataInputStream(anotherSocket.getInputStream());
                         int bytesRead;
@@ -272,6 +273,7 @@ public class MainActivity extends ActionBarActivity {
                     } catch (IOException e) {
                         System.out.println("Logging: " + e.getMessage());
                     }
+
                 }
             }
         };
