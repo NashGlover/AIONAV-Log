@@ -1,6 +1,8 @@
 package com.nashglover.myapplication.app;
 
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -47,6 +49,18 @@ public class MainActivity extends ActionBarActivity {
     /* Holds all the coordinates */
     Vector coordinateVector = new Vector(300, 100);
 
+    public Handler _handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            System.out.println("Handling message thread : " + Thread.currentThread().getName());
+            Bundle bundle = msg.getData();
+            System.out.println(String.format("Handler.handleMessage(): msg=%s", bundle.getString("Test")));
+            // This is where main activity thread receives messages
+            // Put here your handling of incoming messages posted by other threads
+            super.handleMessage(msg);
+        }
+
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -15,7 +15,6 @@ import java.net.SocketTimeoutException;
  */
 public class LoggingThread extends IntentService {
 
-    MainActivity mainActivity;
     ServerSocket listener;
 
     Handler logHandler = new Handler() {
@@ -45,9 +44,8 @@ public class LoggingThread extends IntentService {
         }*/
     }
 
-    public LoggingThread(ServerSocket _listener) {
+    public LoggingThread(Handler _handler) {
         super("LoggingThread");
-        listener = _listener;
     }
 
     public void run()

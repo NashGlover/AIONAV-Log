@@ -25,4 +25,6 @@ public class Coordinate {
     public double getZ() {
         return z;
     }
+
+    public double getTimestamp() { return timestamp; }
 }
