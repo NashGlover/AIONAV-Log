@@ -1,12 +1,9 @@
-package com.nashglover.myapplication.app;
+package com.nashglover.myapplication.app.networking;
 
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.net.ServerSocket;
+
 
 import android.os.Handler;
 import android.os.Bundle;
@@ -23,7 +20,7 @@ public class NetworkConnection implements Connection {
     private int port;
     private Handler mainHandler;
 
-    NetworkConnection(int _port, Handler _handler) {
+   public NetworkConnection(int _port, Handler _handler) {
         port = _port;
         mainHandler = _handler;
     }

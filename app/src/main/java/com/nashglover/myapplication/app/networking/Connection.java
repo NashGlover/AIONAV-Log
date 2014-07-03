@@ -1,8 +1,5 @@
-package com.nashglover.myapplication.app;
+package com.nashglover.myapplication.app.networking;
 
-/**
- * Created by rglover3 on 7/3/2014.
- */
 public interface Connection {
 
     public void connect();

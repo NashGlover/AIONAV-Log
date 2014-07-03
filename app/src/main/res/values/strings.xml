@@ -14,4 +14,8 @@
     <string name="ip_text">IP Address:</string>
     <string name="submit_ip_text">Submit</string>
 
+    <!-- For the Radio Group -->
+    <string name="radio_bluetooth">Bluetooth</string>
+    <string name="radio_wifi">WiFi</string>
+
 </resources>

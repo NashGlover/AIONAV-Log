@@ -1,25 +1,23 @@
 package com.nashglover.myapplication.app;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RadioButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Button;
 import android.os.Handler;
 import android.os.Message;
 
+import com.nashglover.myapplication.app.networking.BluetoothConnection;
+import com.nashglover.myapplication.app.networking.NetworkConnection;
+
 import java.io.DataInputStream;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -40,8 +38,10 @@ public class MainActivity extends ActionBarActivity {
     Boolean connecting;
     ServerSocket listener;
     Socket anotherSocket;
+    Boolean bluetooth;
 
     NetworkConnection network;
+    BluetoothConnection bluetoothNetwork;
 
     LoggingThread logThread = null;
 
@@ -97,6 +97,7 @@ public class MainActivity extends ActionBarActivity {
         logText = (TextView) findViewById(R.id.log_message);
         logScroll = (ScrollView) findViewById(R.id.log_scroll);
         tracking = new AtomicBoolean();
+        bluetooth = true;
     }
 
     @Override
@@ -134,7 +135,20 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void onRadioButtonClicked (View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+        switch(view.getId()) {
+            case R.id.radio_bluetooth:
+                if (checked)
+                    bluetooth = true;
+                    break;
+            case R.id.radio_wifi:
+                if (checked)
+                    bluetooth = false;
+                    break;
+        }
 
+    }
     public void disconnectClick(View view)
     {
         logThread.stopLogging();
@@ -159,63 +173,21 @@ public class MainActivity extends ActionBarActivity {
         logText.append(String.format("Connecting to device...%n"));
         System.out.println("About to connect");
         connecting = true;
-        connectButton.setEnabled(false);
-        /*Runnable runnable = new Runnable() {
-            public void run() {
-                System.out.println("TESTING");
-
-                /* While until finding connection */
-                   /* try {
-                        int timeout = 7000;
-                        int port = 2222;
-                        String addr = "localhost";
-                        System.out.println("Before the socket!");
-                      //  InetSocketAddress inetAddr = new InetSocketAddress(addr, port);
-                        // listener.setSoTimeout(4000);
-                        //listener = new ServerSocket(2222);
-                        // Socket input = listener.accept();
-                        //anotherSocket = new Socket("localhost", 2222);
-                        if (count>0 && listener.isClosed())
-                        {
-                            System.out.println("It's closed!");
-                        }
-                        listener = new ServerSocket(2222);
-                        anotherSocket = new Socket();
-                        //anotherSocket.setSoTimeout(10000);
-                        anotherSocket = listener.accept();
-                        runOnUiThread(new Runnable() {
-                            public void run() {
-                                logText.append(String.format("Connected%n"));
-                                (findViewById(R.id.save_button)).setEnabled(true);
-                                (findViewById(R.id.start_log_button)).setEnabled(true);
-                            }
-                        });
-                        System.out.println("After the socket");
-                        //logText.append(String.format("Connected!%n"));
-                        connecting = false;
-                    } catch (SocketTimeoutException timeoutException){
-                        System.out.println("TIMEOUT!");
-                    } catch (UnknownHostException e) {
-                        System.out.println("Unknown host");
-                        // logText.append(String.format("Still not connected...%n"));
-                    } catch (IOException ioException) {
-                        System.out.println(ioException.getMessage());
-                    }
-            }
-        };
-        Thread myThread = new Thread(runnable);*/
-        /* myThread.start(); */
-        network = new NetworkConnection(2222, handler);
-        network.connect();
-        System.out.println("Testing again!");
-        /*catch (SocketException e)
-        {
-            System.out.printf(e.toString() + "%n");
-        }*/
+        if (!bluetooth) {
+            connectButton.setEnabled(false);
+            network = new NetworkConnection(2222, handler);
+            network.connect();
+            System.out.println("Testing again!");
+        }
+        else if (bluetooth) {
+            System.out.println("Bluetooth!");
+            bluetoothNetwork = new BluetoothConnection();
+            bluetoothNetwork.connect();
+        }
         (findViewById(R.id.start_button)).setEnabled(false);
         (findViewById(R.id.end_button)).setEnabled(true);
         System.out.println("After the button");
-       // ((Button) findViewById(R.id.end_log_button)).setEnabled(true);
+
 
     }
 
@@ -228,61 +200,6 @@ public class MainActivity extends ActionBarActivity {
 
     public void startLogging(View view)
     {
-       /* System.out.println("Pressed start tracking");
-        startLogButton.setEnabled(false);
-        Runnable runnable = new Runnable() {
-            public void run() {
-                byte[] messageByte = new byte[1000];
-                int length;
-                int packetType;
-                long device1, device2;
-                long timestamp = 0;
-                double longitude, latitude, altitude;
-                tracking.set(true);
-                double x, y, z;
-                while (tracking.get()) {
-                    try {
-                        in = new DataInputStream(anotherSocket.getInputStream());
-                        int bytesRead;
-                        bytesRead = in.read(messageByte);
-                        ByteBuffer buffer = ByteBuffer.wrap(messageByte);
-
-                        if (bytesRead == 32 || bytesRead == 56) {
-                            length = buffer.getInt();
-                            packetType = buffer.getInt(4);
-                            device1 = buffer.getLong(8);
-                            device2 = buffer.getLong(16);
-                            if (bytesRead == 32) {
-                                timestamp = buffer.getLong(24);
-                               // String line = String.format("Length: %d, Packet Type: %d, Device ID: %d %d, Timestamp: %d%n", length, packetType, device1, device2, timestamp);
-                               // addToLog(line);
-                                System.out.println("Heartbeat!");
-                            }
-                            else if (bytesRead == 56) {
-                                if (packetType == 1) {
-                                    timestamp = buffer.getLong(24);
-                                    x = buffer.getDouble(32);
-                                    y = buffer.getDouble(40);
-                                    z = buffer.getDouble(48);
-
-                                    Coordinate currentCoordinate = new Coordinate(timestamp, x, y, z);
-                                    coordinateVector.add(currentCoordinate);
-                                    System.out.println("Coordinate vector size: " + coordinateVector.size());
-                                    System.out.println("Position Update");
-                                    String line = String.format("Timestamp: %d, x: %f, y: %f, z: %f%n", timestamp, x, y, z);
-                                    addToLog(line);
-                                }
-                            }
-                        }
-                    } catch (IOException e) {
-                        System.out.println("Logging: " + e.getMessage());
-                    }
-
-                }
-            }
-        };
-        logThread = new Thread(runnable);
-        logThread.start();*/
         logThread.startLogging();
     }
 

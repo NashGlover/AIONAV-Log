@@ -7,7 +7,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_weight="8"
+        android:layout_weight="9"
         android:layout_height="0dp">
         <ScrollView android:id="@+id/log_scroll"
             android:layout_width="match_parent"
@@ -25,6 +25,27 @@
 
         </LinearLayout>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp">
+        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/radio_bluetooth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_bluetooth"
+                android:onClick="onRadioButtonClicked"/>
+            <RadioButton android:id="@+id/radio_wifi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_wifi"
+                android:onClick="onRadioButtonClicked"/>
+        </RadioGroup>
+        </LinearLayout>
    <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
