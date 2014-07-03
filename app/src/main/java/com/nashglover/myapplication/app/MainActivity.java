@@ -39,6 +39,8 @@ public class MainActivity extends ActionBarActivity {
     ServerSocket listener;
     Socket anotherSocket;
 
+    NetworkConnection network;
+
     int count = 0;
     DataInputStream in;
 
@@ -149,12 +151,12 @@ public class MainActivity extends ActionBarActivity {
         System.out.println("About to connect");
         connecting = true;
         connectButton.setEnabled(false);
-        Runnable runnable = new Runnable() {
+        /*Runnable runnable = new Runnable() {
             public void run() {
                 System.out.println("TESTING");
 
                 /* While until finding connection */
-                    try {
+                   /* try {
                         int timeout = 7000;
                         int port = 2222;
                         String addr = "localhost";
@@ -192,8 +194,10 @@ public class MainActivity extends ActionBarActivity {
                     }
             }
         };
-        Thread myThread = new Thread(runnable);
-        myThread.start();
+        Thread myThread = new Thread(runnable);*/
+        /* myThread.start(); */
+        network = new NetworkConnection("localhost", 2222);
+
         System.out.println("Testing again!");
         /*catch (SocketException e)
         {
