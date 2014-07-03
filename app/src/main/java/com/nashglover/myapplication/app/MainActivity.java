@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Button;
+import android.os.Handler;
+import android.os.Message;
 
 import java.io.DataInputStream;
 import java.net.InetSocketAddress;
@@ -41,10 +43,40 @@ public class MainActivity extends ActionBarActivity {
 
     NetworkConnection network;
 
+    LoggingThread logThread = null;
+
     int count = 0;
     DataInputStream in;
 
-    Thread logThread;
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            Bundle bundle = msg.getData();
+            String type = bundle.getString("type");
+            if (type.equals("Connected")){
+                logText.append(String.format("Connected%n"));
+                saveButton.setEnabled(true);
+                startLogButton.setEnabled(true);
+                logThread = new LoggingThread(network.getSocket(), handler);
+                (new Thread(logThread)).start();
+            }
+            else if (type.equals("Disconnected")) {
+                addToLog(String.format("Disconnected%n"));
+                startLogButton.setEnabled(false);
+                endLogButton.setEnabled(false);
+                connectButton.setEnabled(true);
+                endButton.setEnabled(false);
+                count++;
+            }
+            else if (type.equals("Logging")) {
+                startLogButton.setEnabled(false);
+                endLogButton.setEnabled(true);
+            }
+            else if (type.equals("New Coordinate")) {
+                addToLog(bundle.getString("coordinate"));
+            }
+        }
+    };
 
     /* Holds all the coordinates */
     Vector coordinateVector = new Vector(300, 100);
@@ -105,31 +137,8 @@ public class MainActivity extends ActionBarActivity {
 
     public void disconnectClick(View view)
     {
-        try {
-            listener.close();
-            System.out.println("Listener closed.");
-            anotherSocket.shutdownInput();
-            anotherSocket.shutdownOutput();
-            anotherSocket.close();
-        }
-        catch (IOException e)
-        {
-            System.out.println("EXCEPTION:");
-            System.out.println(e.getMessage());
-        }
-
-        runOnUiThread(new Runnable() {
-            public void run() {
-                tracking.set(false);
-                logText.append(String.format("Disconnected%n"));
-                logScroll.fullScroll(View.FOCUS_DOWN);
-                startLogButton.setEnabled(false);
-                endLogButton.setEnabled(false);
-                connectButton.setEnabled(true);
-                endButton.setEnabled(false);
-                count++;
-            }
-        });
+        logThread.stopLogging();
+        network.disconnect();
     }
 
     public void stopLogging(View view)
@@ -196,8 +205,8 @@ public class MainActivity extends ActionBarActivity {
         };
         Thread myThread = new Thread(runnable);*/
         /* myThread.start(); */
-        network = new NetworkConnection("localhost", 2222);
-
+        network = new NetworkConnection(2222, handler);
+        network.connect();
         System.out.println("Testing again!");
         /*catch (SocketException e)
         {
@@ -213,25 +222,16 @@ public class MainActivity extends ActionBarActivity {
     public void  addToLog(String newMessage)
     {
         final String finalString = newMessage;
-        runOnUiThread(new Runnable() {
-            public void run() {
-                logText.append(finalString);
-                logScroll.fullScroll(View.FOCUS_DOWN);
-            }
-        });
+        logText.append(finalString);
+        logScroll.fullScroll(View.FOCUS_DOWN);
     }
 
     public void startLogging(View view)
     {
-        System.out.println("Pressed start tracking");
+       /* System.out.println("Pressed start tracking");
+        startLogButton.setEnabled(false);
         Runnable runnable = new Runnable() {
             public void run() {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        startLogButton.setEnabled(false);
-                        endLogButton.setEnabled(true);
-                    }
-                });
                 byte[] messageByte = new byte[1000];
                 int length;
                 int packetType;
@@ -282,7 +282,8 @@ public class MainActivity extends ActionBarActivity {
             }
         };
         logThread = new Thread(runnable);
-        logThread.start();
+        logThread.start();*/
+        logThread.startLogging();
     }
 
 }
