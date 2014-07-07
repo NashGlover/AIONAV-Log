@@ -3,6 +3,9 @@ package com.nashglover.myapplication.app.networking;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
 import com.nashglover.myapplication.app.networking.Connection;
 
@@ -23,12 +26,16 @@ public class BluetoothConnection implements Connection {
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
 
+    Handler mainHandler = null;
+
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    public BluetoothConnection() {
+    public BluetoothConnection(Handler _mainHandler) {
+        mainHandler = _mainHandler;
     }
 
     public void connect() {
+        System.out.println("In bluetooth connect()");
         Runnable runnable = new Runnable() {
             public void run() {
                 System.out.println("The Bluetooth Thread: " + Thread.currentThread().getName());
@@ -57,6 +64,14 @@ public class BluetoothConnection implements Connection {
                     }
                 }
                 startClient();
+                System.out.println("About to send...");
+                Message msg = mainHandler.obtainMessage();
+                System.out.println("Getting message...");
+                Bundle bundle = new Bundle();
+                bundle.putString("type", "Connected");
+                bundle.putString("connection", "Bluetooth");
+                msg.setData(bundle);
+                mainHandler.sendMessage(msg);
             }
         };
         Thread connectThread = new Thread(runnable);
@@ -90,7 +105,11 @@ public class BluetoothConnection implements Connection {
 
 
     public void disconnect() {
-
+        try {
+            btSocket.close();
+        } catch (IOException e) {
+            System.out.println("Error closing Bluetooth socket: " + e.getMessage());
+        }
     }
 
     public Boolean isConnected(){

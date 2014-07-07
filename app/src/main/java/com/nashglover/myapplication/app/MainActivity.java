@@ -1,5 +1,7 @@
 package com.nashglover.myapplication.app;
 
+import android.content.Context;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,7 +17,10 @@ import android.os.Message;
 import com.nashglover.myapplication.app.networking.BluetoothConnection;
 import com.nashglover.myapplication.app.networking.NetworkConnection;
 
+import java.io.File;
 import java.io.DataInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
@@ -51,14 +56,23 @@ public class MainActivity extends ActionBarActivity {
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            System.out.println("In handle message");
             Bundle bundle = msg.getData();
             String type = bundle.getString("type");
             if (type.equals("Connected")){
-                logText.append(String.format("Connected%n"));
-                saveButton.setEnabled(true);
-                startLogButton.setEnabled(true);
-                logThread = new LoggingThread(network.getSocket(), handler);
-                (new Thread(logThread)).start();
+                String networkType = bundle.getString("connection");
+                if (networkType.equals("Network")) {
+                    logText.append(String.format("Connected%n"));
+                    saveButton.setEnabled(true);
+                    startLogButton.setEnabled(true);
+                    logThread = new LoggingThread(network.getSocket(), handler);
+                    (new Thread(logThread)).start();
+                }
+                else if (networkType.equals("Bluetooth")) {
+                    logText.append(String.format("Connected%n"));
+                    saveButton.setEnabled(true);
+                    startLogButton.setEnabled(true);
+                }
             }
             else if (type.equals("Disconnected")) {
                 addToLog(String.format("Disconnected%n"));
@@ -91,7 +105,7 @@ public class MainActivity extends ActionBarActivity {
         startLogButton = (Button) findViewById(R.id.start_log_button);
         endLogButton = (Button) findViewById(R.id.end_log_button);
         endButton.setEnabled(false);
-        saveButton.setEnabled(false);
+        saveButton.setEnabled(true);
         startLogButton.setEnabled(false);
         endLogButton.setEnabled(false);
         logText = (TextView) findViewById(R.id.log_message);
@@ -139,16 +153,20 @@ public class MainActivity extends ActionBarActivity {
         boolean checked = ((RadioButton) view).isChecked();
         switch(view.getId()) {
             case R.id.radio_bluetooth:
-                if (checked)
+                if (checked) {
                     bluetooth = true;
+                }
                     break;
             case R.id.radio_wifi:
-                if (checked)
+                if (checked) {
+                    System.out.println("Wifi chosen!");
                     bluetooth = false;
+                }
                     break;
         }
 
     }
+
     public void disconnectClick(View view)
     {
         logThread.stopLogging();
@@ -181,22 +199,25 @@ public class MainActivity extends ActionBarActivity {
         }
         else if (bluetooth) {
             System.out.println("Bluetooth!");
-            bluetoothNetwork = new BluetoothConnection();
+            bluetoothNetwork = new BluetoothConnection(handler);
             bluetoothNetwork.connect();
         }
         (findViewById(R.id.start_button)).setEnabled(false);
         (findViewById(R.id.end_button)).setEnabled(true);
         System.out.println("After the button");
+        (findViewById(R.id.radio_bluetooth)).setEnabled(false);
+        (findViewById(R.id.radio_wifi)).setEnabled(false);
 
 
     }
 
-    public void  addToLog(String newMessage)
+    public void addToLog(String newMessage)
     {
         final String finalString = newMessage;
         logText.append(finalString);
         logScroll.fullScroll(View.FOCUS_DOWN);
     }
+
 
     public void startLogging(View view)
     {

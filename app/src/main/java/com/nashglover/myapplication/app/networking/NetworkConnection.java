@@ -39,6 +39,7 @@ public class NetworkConnection implements Connection {
                     Message msg = mainHandler.obtainMessage();
                     Bundle bundle = new Bundle();
                     bundle.putString("type", "Connected");
+                    bundle.putString("connection", "Network");
                     msg.setData(bundle);
                     mainHandler.sendMessage(msg);
 
