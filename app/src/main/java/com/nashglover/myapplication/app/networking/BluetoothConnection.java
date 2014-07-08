@@ -68,6 +68,7 @@ public class BluetoothConnection implements Connection {
                 Message msg = mainHandler.obtainMessage();
                 System.out.println("Getting message...");
                 Bundle bundle = new Bundle();
+                System.out.println("Testing");
                 bundle.putString("type", "Connected");
                 bundle.putString("connection", "Bluetooth");
                 msg.setData(bundle);
