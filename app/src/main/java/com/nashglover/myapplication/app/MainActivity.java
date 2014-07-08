@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.nashglover.myapplication.app.networking.BluetoothConnection;
+import com.nashglover.myapplication.app.networking.BluetoothLogging;
 import com.nashglover.myapplication.app.networking.NetworkConnection;
 
 import java.io.File;
@@ -49,6 +50,7 @@ public class MainActivity extends ActionBarActivity {
     BluetoothConnection bluetoothNetwork;
 
     LoggingThread logThread = null;
+    BluetoothLogging bluetoothLogging = null;
 
     int count = 0;
     DataInputStream in;
@@ -69,8 +71,12 @@ public class MainActivity extends ActionBarActivity {
                     (new Thread(logThread)).start();
                 }
                 else if (networkType.equals("Bluetooth")) {
+                    System.out.println("In bluetooth connection");
                     logText.append(String.format("Connected%n"));
                     saveButton.setEnabled(true);
+                    bluetoothLogging = new BluetoothLogging(bluetoothNetwork.getSocket(), handler);
+                    System.out.println("Created new BluetoothLogging");
+                    (new Thread(bluetoothLogging)).start();
                     startLogButton.setEnabled(true);
                 }
             }

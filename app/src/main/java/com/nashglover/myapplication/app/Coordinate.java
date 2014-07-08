@@ -7,7 +7,7 @@ public class Coordinate {
     public double x, y, z;
     public long timestamp;
 
-    Coordinate(long _timestamp, double _x, double _y, double _z) {
+    public Coordinate(long _timestamp, double _x, double _y, double _z) {
         timestamp = _timestamp;
         x = _x;
         y = _y;

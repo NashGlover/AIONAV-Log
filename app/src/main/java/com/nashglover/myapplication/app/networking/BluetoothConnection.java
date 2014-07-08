@@ -11,6 +11,7 @@ import com.nashglover.myapplication.app.networking.Connection;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -28,7 +29,7 @@ public class BluetoothConnection implements Connection {
 
     Handler mainHandler = null;
 
-    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private static final UUID MY_UUID = UUID.fromString("00000001-0000-1000-8000-00805F9B34FB");
 
     public BluetoothConnection(Handler _mainHandler) {
         mainHandler = _mainHandler;
@@ -56,7 +57,8 @@ public class BluetoothConnection implements Connection {
                     // Loop through paired devices
                     for (BluetoothDevice device : pairedDevices) {
                         System.out.println(device.getName());
-                        if (device.getName().equals("IMAGING078")) {
+                        //if (device.getName().equals("IMAGING078")) {
+                        if (device.getName().equals("MicroSoft-PC")){
                             System.out.println("Setting the device up.");
                             clientDevice = device;
                             break;
@@ -68,7 +70,6 @@ public class BluetoothConnection implements Connection {
                 Message msg = mainHandler.obtainMessage();
                 System.out.println("Getting message...");
                 Bundle bundle = new Bundle();
-                System.out.println("Testing");
                 bundle.putString("type", "Connected");
                 bundle.putString("connection", "Bluetooth");
                 msg.setData(bundle);
@@ -113,8 +114,10 @@ public class BluetoothConnection implements Connection {
         }
     }
 
+    public BluetoothSocket getSocket() {
+        return btSocket;
+    }
     public Boolean isConnected(){
-
         return true;
     }
 

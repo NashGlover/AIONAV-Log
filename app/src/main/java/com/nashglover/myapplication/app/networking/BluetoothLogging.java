@@ -1,63 +1,37 @@
-package com.nashglover.myapplication.app;
+package com.nashglover.myapplication.app.networking;
 
-import android.app.Activity;
-import android.app.IntentService;
-import android.content.Intent;
+import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.nashglover.myapplication.app.Coordinate;
+
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
-
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Created by nash on 6/12/14.
- */
-public class LoggingThread extends Thread {
-
-    Handler mainHandler;
-    ServerSocket listener;
-    Socket inSocket;
+public class BluetoothLogging implements Runnable {
 
     Vector coordinateVector = new Vector<Coordinate>(300, 100);
+    BluetoothSocket serverSocket;
+    Handler mainHandler;
+    AtomicBoolean tracking;
+    AtomicBoolean logging;
 
-    private DataInputStream in;
-    private AtomicBoolean tracking;
-    private AtomicBoolean logging;
+    DataInputStream in;
 
-    public LoggingThread(Socket _inSocket, Handler _handler)
-    {
-        System.out.println("Creating log thread");
-        inSocket = _inSocket;
-        mainHandler = _handler;
-        logging = new AtomicBoolean(false);
+    public BluetoothLogging(BluetoothSocket _serverSocket, Handler _mainHandler) {
+        serverSocket = _serverSocket;
+        mainHandler = _mainHandler;
         tracking = new AtomicBoolean(false);
+        logging = new AtomicBoolean(false);
     }
 
-    public void startLogging() {
-        logging.set(true);
-        if (logging.get()) { System.out.println("Logging is enabled"); }
-        Message msg = mainHandler.obtainMessage();
-        Bundle bundle = new Bundle();
-        bundle.putString("type", "Logging");
-        msg.setData(bundle);
-        mainHandler.sendMessage(msg);
-    }
-
-    public void stopLogging() {
-        tracking.set(false);
-        logging.set(false);
-    }
-
-    private void updateLog(String line) {
+    public void updateLog(String line) {
         Message msg = mainHandler.obtainMessage();
         Bundle bundle = new Bundle();
         bundle.putString("type", "New Coordinate");
@@ -66,8 +40,7 @@ public class LoggingThread extends Thread {
         mainHandler.sendMessage(msg);
     }
 
-    public void run()
-    {
+    public void run() {
         System.out.printf("Hello from a logging thread!%n");
         byte[] messageByte = new byte[1000];
         int length;
@@ -76,32 +49,34 @@ public class LoggingThread extends Thread {
         long timestamp = 0;
         double longitude, latitude, altitude;
         tracking.set(true);
+        logging.set(true);
         double x, y, z;
         try {
-            in = new DataInputStream(inSocket.getInputStream());
+            in = new DataInputStream(serverSocket.getInputStream());
         } catch (Exception e) {
-            System.out.println("Starting data input stream: " + e.getMessage());
+            System.out.println("Error starting data input stream: " + e.getMessage());
         }
         while (tracking.get()) {
             try {
                 int bytesRead;
-                inSocket.setSoTimeout(10000);
+                System.out.println("Reading...");
                 bytesRead = in.read(messageByte);
+                System.out.println("Bytes read: " + bytesRead);
                 ByteBuffer buffer = ByteBuffer.wrap(messageByte);
-
-                if (bytesRead == 32 || bytesRead == 56) {
-                    length = buffer.getInt();
+                length = buffer.getInt();
+                System.out.println(length);
+                if (length == 32 || length == 56) {
+                    System.out.println(length);
                     packetType = buffer.getInt(4);
                     device1 = buffer.getLong(8);
                     device2 = buffer.getLong(16);
-                    if (bytesRead == 32) {
+                    if (length == 32) {
                         timestamp = buffer.getLong(24);
                         // String line = String.format("Length: %d, Packet Type: %d, Device ID: %d %d, Timestamp: %d%n", length, packetType, device1, device2, timestamp);
                         // addToLog(line);
                         System.out.println("Heartbeat!");
-                    } else if (bytesRead == 56) {
-                        System.out.println("Location updated!");
-                        System.out.println("Packet type: " + packetType);
+                    } else if (length == 56) {
+                        System.out.println("In movement");
                         if (packetType == 1) {
                             if (logging.get()) {
                                 System.out.println("Logging is enabled!");
@@ -131,6 +106,5 @@ public class LoggingThread extends Thread {
             }
 
         }
-
     }
 }
