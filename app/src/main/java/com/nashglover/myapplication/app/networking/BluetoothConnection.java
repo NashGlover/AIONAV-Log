@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.nashglover.myapplication.app.LoggingThread;
 import com.nashglover.myapplication.app.networking.Connection;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.UUID;
 */
 public class BluetoothConnection implements Connection {
 
+    BluetoothLogging logThread;
     ArrayList<BluetoothAdapter> adapterArray;
     private BluetoothAdapter adapter = null;
     private BluetoothDevice clientDevice = null;
@@ -57,9 +59,10 @@ public class BluetoothConnection implements Connection {
                     // Loop through paired devices
                     for (BluetoothDevice device : pairedDevices) {
                         System.out.println(device.getName());
-                        if (device.getName().equals("IMAGING078")) {
+                        //if (device.getName().equals("IMAGING078")) {
                         //if (device.getName().equals("MicroSoft-PC")){
                         //if (device.getName().equals("NASH-PC")) {
+                        if (device.getName().equals("IMAGING176")) {
                             System.out.println("Setting the device up.");
                             clientDevice = device;
                             break;
@@ -104,6 +107,11 @@ public class BluetoothConnection implements Connection {
         } catch (IOException e) {
             System.out.println("Error with output stream: " + e.getMessage());
         }
+    }
+
+    public void startLogging() {
+        logThread = new BluetoothLogging(this.btSocket, mainHandler);
+        (new Thread(logThread)).start();
     }
 
 

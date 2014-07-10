@@ -104,8 +104,8 @@ public class BluetoothLogging implements Runnable {
                 tracking.set(false);
             } catch (IOException e) {
                 System.out.println("Logging: " + e.getMessage());
+                tracking.set(false);
             }
-
         }
     }
 }

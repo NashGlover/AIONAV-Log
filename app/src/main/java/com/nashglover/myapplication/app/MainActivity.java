@@ -34,6 +34,8 @@ public class MainActivity extends ActionBarActivity {
     TextView logText;
     ScrollView logScroll;
 
+    int flag = 1;
+
     Button endButton;
     Button saveButton;
     Button startLogButton;
@@ -118,19 +120,20 @@ public class MainActivity extends ActionBarActivity {
         logScroll = (ScrollView) findViewById(R.id.log_scroll);
         tracking = new AtomicBoolean();
         bluetooth = true;
+        System.out.println("FLAG: " + flag);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
+        flag = 2;
         System.out.println("Activity has been stopped!");
     }
 
     @Override
     protected void onDestroy() {
       //  super.onDestroy();
-
+        flag = 2;
         System.out.println("Activity has been destroyed!");
         super.onDestroy();
     }
