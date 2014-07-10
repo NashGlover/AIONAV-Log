@@ -86,6 +86,7 @@ public class LoggingThread extends Thread {
             try {
                 int bytesRead;
                 inSocket.setSoTimeout(10000);
+                System.out.println("READING...");
                 bytesRead = in.read(messageByte);
                 ByteBuffer buffer = ByteBuffer.wrap(messageByte);
 

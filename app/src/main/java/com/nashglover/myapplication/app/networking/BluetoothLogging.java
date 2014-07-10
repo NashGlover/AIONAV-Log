@@ -101,6 +101,7 @@ public class BluetoothLogging implements Runnable {
                 }
             } catch (SocketTimeoutException timeoutException) {
                 System.out.println("Socket timed out!");
+                tracking.set(false);
             } catch (IOException e) {
                 System.out.println("Logging: " + e.getMessage());
             }
