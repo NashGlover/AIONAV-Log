@@ -40,6 +40,14 @@ public class BluetoothLogging implements Runnable {
         mainHandler.sendMessage(msg);
     }
 
+    public void startLogging() {
+        logging.set(true);
+    }
+
+    public void stopLogging() {
+        logging.set(false);
+    }
+
     public void run() {
         System.out.printf("Hello from a logging thread!%n");
         byte[] messageByte = new byte[1000];

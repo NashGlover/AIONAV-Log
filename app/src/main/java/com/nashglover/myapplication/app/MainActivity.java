@@ -1,7 +1,5 @@
 package com.nashglover.myapplication.app;
 
-import android.content.Context;
-import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,10 +16,7 @@ import com.nashglover.myapplication.app.networking.BluetoothConnection;
 import com.nashglover.myapplication.app.networking.BluetoothLogging;
 import com.nashglover.myapplication.app.networking.NetworkConnection;
 
-import java.io.File;
 import java.io.DataInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
@@ -36,17 +31,15 @@ public class MainActivity extends ActionBarActivity {
 
     int flag = 1;
 
-    Button endButton;
+    Button disconnectButton;
     Button saveButton;
     Button startLogButton;
     Button endLogButton;
     Button connectButton;
 
-    AtomicBoolean tracking;
+    AtomicBoolean tracking = new AtomicBoolean();
     Boolean connecting;
-    ServerSocket listener;
-    Socket anotherSocket;
-    Boolean bluetooth;
+    Boolean bluetooth = true;
 
     NetworkConnection network;
     BluetoothConnection bluetoothNetwork;
@@ -87,7 +80,7 @@ public class MainActivity extends ActionBarActivity {
                 startLogButton.setEnabled(false);
                 endLogButton.setEnabled(false);
                 connectButton.setEnabled(true);
-                endButton.setEnabled(false);
+                disconnectButton.setEnabled(false);
                 count++;
             }
             else if (type.equals("Logging")) {
@@ -105,28 +98,31 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        System.out.println("In onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         connectButton = (Button) findViewById(R.id.start_button);
-        endButton = (Button) findViewById(R.id.end_button);
+        disconnectButton = (Button) findViewById(R.id.end_button);
         saveButton = (Button) findViewById(R.id.save_button);
         startLogButton = (Button) findViewById(R.id.start_log_button);
         endLogButton = (Button) findViewById(R.id.end_log_button);
-        endButton.setEnabled(false);
-        saveButton.setEnabled(true);
-        startLogButton.setEnabled(false);
-        endLogButton.setEnabled(false);
         logText = (TextView) findViewById(R.id.log_message);
         logScroll = (ScrollView) findViewById(R.id.log_scroll);
-        tracking = new AtomicBoolean();
-        bluetooth = true;
-        System.out.println("FLAG: " + flag);
+
+        if (savedInstanceState != null) {
+            logText.setText(savedInstanceState.getString("logtext"));
+            connectButton.setEnabled(savedInstanceState.getBoolean("connectState"));
+            disconnectButton.setEnabled(savedInstanceState.getBoolean("disconnectState"));
+            startLogButton.setEnabled(savedInstanceState.getBoolean("startLogState"));
+            endLogButton.setEnabled(savedInstanceState.getBoolean("endLogState"));
+            saveButton.setEnabled(savedInstanceState.getBoolean("saveState"));
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        flag = 2;
+
         System.out.println("Activity has been stopped!");
     }
 
@@ -144,6 +140,17 @@ public class MainActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        String savedLogText = logText.getText().toString();
+        savedInstanceState.putString("logtext", savedLogText);
+        savedInstanceState.putBoolean("connectState", connectButton.isEnabled());
+        savedInstanceState.putBoolean("disconnectState", disconnectButton.isEnabled());
+        savedInstanceState.putBoolean("saveState", saveButton.isEnabled());
+        savedInstanceState.putBoolean("startLogState", startLogButton.isEnabled());
+        savedInstanceState.putBoolean("endLogState", endLogButton.isEnabled());
     }
 
     @Override

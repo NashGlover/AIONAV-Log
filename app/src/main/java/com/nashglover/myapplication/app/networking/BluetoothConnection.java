@@ -7,12 +7,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.nashglover.myapplication.app.LoggingThread;
-import com.nashglover.myapplication.app.networking.Connection;
-
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -25,7 +21,7 @@ public class BluetoothConnection implements Connection {
     BluetoothLogging logThread;
     ArrayList<BluetoothAdapter> adapterArray;
     private BluetoothAdapter adapter = null;
-    private BluetoothDevice clientDevice = null;
+    private BluetoothDevice serverDevice = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
 
@@ -37,6 +33,7 @@ public class BluetoothConnection implements Connection {
         mainHandler = _mainHandler;
     }
 
+    /* Connect to Bluetooth Server */
     public void connect() {
         System.out.println("In bluetooth connect()");
         Runnable runnable = new Runnable() {
@@ -64,12 +61,12 @@ public class BluetoothConnection implements Connection {
                         //if (device.getName().equals("NASH-PC")) {
                         if (device.getName().equals("IMAGING176")) {
                             System.out.println("Setting the device up.");
-                            clientDevice = device;
+                            serverDevice = device;
                             break;
                         }
                     }
                 }
-                startClient();
+                connectToServer();
                 System.out.println("About to send...");
                 Message msg = mainHandler.obtainMessage();
                 System.out.println("Getting message...");
@@ -84,9 +81,9 @@ public class BluetoothConnection implements Connection {
         connectThread.start();
     }
 
-    public void startClient() {
+    public void connectToServer() {
         try {
-            btSocket = clientDevice.createRfcommSocketToServiceRecord(MY_UUID);
+            btSocket = serverDevice.createRfcommSocketToServiceRecord(MY_UUID);
             System.out.println("Created the socket worked.");
         } catch (IOException e) {
             System.out.println("From starting client: " + e.getMessage());
@@ -114,6 +111,9 @@ public class BluetoothConnection implements Connection {
         (new Thread(logThread)).start();
     }
 
+    public void stopLogging() {
+        logThread.stopLogging();
+    }
 
     public void disconnect() {
         try {
