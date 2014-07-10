@@ -18,12 +18,13 @@ import java.util.UUID;
 */
 public class BluetoothConnection implements Connection {
 
-    BluetoothLogging logThread;
+    public BluetoothLogging logThread;
     ArrayList<BluetoothAdapter> adapterArray;
     private BluetoothAdapter adapter = null;
     private BluetoothDevice serverDevice = null;
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
+    boolean flag = false;
 
     Handler mainHandler = null;
 
@@ -107,20 +108,35 @@ public class BluetoothConnection implements Connection {
     }
 
     public void startLogging() {
-        logThread = new BluetoothLogging(this.btSocket, mainHandler);
+        logThread = new BluetoothLogging(this, this.btSocket, mainHandler);
         (new Thread(logThread)).start();
     }
 
     public void stopLogging() {
-        logThread.stopLogging();
+        if (logThread.isLogging()) {
+            logThread.stopLogging();
+        }
     }
 
     public void disconnect() {
-        try {
-            btSocket.close();
-        } catch (IOException e) {
-            System.out.println("Error closing Bluetooth socket: " + e.getMessage());
-        }
+        stopLogging();
+        Runnable disconnect = new Runnable() {
+            public void run() {
+                synchronized(BluetoothConnection.this) {
+                    try {
+                        if (!flag) {
+                            BluetoothConnection.this.wait();
+                            btSocket.close();
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Error closing Bluetooth socket: " + e.getMessage());
+                    } catch (InterruptedException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+        };
+        Thread disconnectThread = new Thread(disconnect);
     }
 
     public BluetoothSocket getSocket() {

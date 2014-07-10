@@ -1,8 +1,5 @@
 package com.nashglover.myapplication.app;
 
-import android.app.Activity;
-import android.app.IntentService;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,7 +10,6 @@ import java.net.SocketTimeoutException;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;

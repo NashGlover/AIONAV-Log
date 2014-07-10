@@ -69,9 +69,8 @@ public class MainActivity extends ActionBarActivity {
                     System.out.println("In bluetooth connection");
                     logText.append(String.format("Connected%n"));
                     saveButton.setEnabled(true);
-                    bluetoothLogging = new BluetoothLogging(bluetoothNetwork.getSocket(), handler);
                     System.out.println("Created new BluetoothLogging");
-                    (new Thread(bluetoothLogging)).start();
+                    (new Thread(bluetoothNetwork.logThread)).start();
                     startLogButton.setEnabled(true);
                 }
             }
@@ -185,8 +184,15 @@ public class MainActivity extends ActionBarActivity {
 
     public void disconnectClick(View view)
     {
-        logThread.stopLogging();
-        network.disconnect();
+        if (bluetooth) {
+            bluetoothNetwork.disconnect();
+        }
+        else {
+            logThread.stopLogging();
+            network.disconnect();
+        }
+        //logThread.stopLogging();
+        //network.disconnect();
     }
 
     public void stopLogging(View view)

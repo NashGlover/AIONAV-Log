@@ -21,10 +21,12 @@ public class BluetoothLogging implements Runnable {
     Handler mainHandler;
     AtomicBoolean tracking;
     AtomicBoolean logging;
+    BluetoothConnection bluetoothConnection;
 
     DataInputStream in;
 
-    public BluetoothLogging(BluetoothSocket _serverSocket, Handler _mainHandler) {
+    public BluetoothLogging(BluetoothConnection _bluetoothConnection, BluetoothSocket _serverSocket, Handler _mainHandler) {
+        bluetoothConnection = _bluetoothConnection;
         serverSocket = _serverSocket;
         mainHandler = _mainHandler;
         tracking = new AtomicBoolean(false);
@@ -46,6 +48,18 @@ public class BluetoothLogging implements Runnable {
 
     public void stopLogging() {
         logging.set(false);
+    }
+    
+    public void stopTracking() {
+        tracking.set(false);
+    }
+
+    public Boolean isTracking() {
+        return tracking.get();
+    }
+
+    public Boolean isLogging() {
+        return logging.get();
     }
 
     public void run() {
@@ -113,6 +127,7 @@ public class BluetoothLogging implements Runnable {
             } catch (IOException e) {
                 System.out.println("Logging: " + e.getMessage());
                 tracking.set(false);
+
             }
         }
     }
