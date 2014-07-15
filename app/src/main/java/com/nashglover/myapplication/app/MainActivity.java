@@ -1,6 +1,8 @@
 package com.nashglover.myapplication.app;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import com.nashglover.myapplication.app.networking.NetworkConnection;
 import java.io.DataInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -44,7 +47,6 @@ public class MainActivity extends ActionBarActivity {
     Boolean bluetooth = true;
 
     NetworkConnection network;
-    BluetoothConnection bluetoothNetwork;
 
     LoggingThread logThread = null;
     BluetoothLogging bluetoothLogging = null;
@@ -93,6 +95,8 @@ public class MainActivity extends ActionBarActivity {
             }
         }
     };
+
+    BluetoothConnection bluetoothNetwork = new BluetoothConnection(handler);
 
     /* Holds all the coordinates */
     Vector coordinateVector = new Vector(300, 100);
@@ -210,23 +214,38 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void chooseDevice(View view) {
-        final AlertDialog.Builder menuAlert = new AlertDialog.Builder(this);
-        final String[] menuList = { "function1", "function2" };
-        menuAlert.setTitle("list dialog");
-        menuAlert.setItems(menuList,new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                switch (item) {
-                    case 0:
-                        // function 1 code here
-                        break;
-                    case 1:
-                        // function 2 code here
-                        break;
+        Runnable runnable = new Runnable() {
+            public void run() {
+                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                Set<BluetoothDevice> pairedDevices = adapter.getBondedDevices();
+                final int size = pairedDevices.size();
+                final BluetoothDevice[] devices = pairedDevices.toArray(new BluetoothDevice[size]);
+                String[] deviceNames = new String[size];
+                int i;
+                for (i=0; i < size; i++) {
+                    deviceNames[i] = devices[i].getName();
                 }
+                final String[] finalNames = deviceNames;
+                MainActivity.this.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        final AlertDialog.Builder menuAlert = new AlertDialog.Builder(MainActivity.this);
+                        menuAlert.setTitle("Bluetooth Devices");
+                        menuAlert.setItems(finalNames, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int item) {
+                                System.out.println("Clicked!");
+                                bluetoothNetwork.setDevice(devices[item]);
+                            }
+                        });
+                        final AlertDialog menuDrop = menuAlert.create();
+                        menuDrop.show();
+                    }
+                });
             }
-        });
-        AlertDialog menuDrop = menuAlert.create();
-        menuDrop.show();
+        };
+        Thread newThread = new Thread(runnable);
+        newThread.start();
     }
 
     public void connectClick(View view) throws InterruptedException
@@ -243,7 +262,6 @@ public class MainActivity extends ActionBarActivity {
         }
         else if (bluetooth) {
             System.out.println("Bluetooth!");
-            bluetoothNetwork = new BluetoothConnection(handler);
             bluetoothNetwork.connect();
         }
         (findViewById(R.id.start_button)).setEnabled(false);

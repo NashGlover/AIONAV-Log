@@ -52,7 +52,7 @@ public class BluetoothConnection implements Connection {
                     System.out.println("It's enabled!");
                 }
 
-                Set<BluetoothDevice> pairedDevices = adapter.getBondedDevices();
+                /*Set<BluetoothDevice> pairedDevices = adapter.getBondedDevices();
                 if (pairedDevices.size() > 0) {
                     // Loop through paired devices
                     for (BluetoothDevice device : pairedDevices) {
@@ -66,16 +66,9 @@ public class BluetoothConnection implements Connection {
                             break;
                         }
                     }
-                }
+                }*/
+                System.out.println("Device: " + serverDevice.getName());
                 connectToServer();
-                System.out.println("About to send...");
-                Message msg = mainHandler.obtainMessage();
-                System.out.println("Getting message...");
-                Bundle bundle = new Bundle();
-                bundle.putString("type", "Connected");
-                bundle.putString("connection", "Bluetooth");
-                msg.setData(bundle);
-                mainHandler.sendMessage(msg);
             }
         };
         Thread connectThread = new Thread(runnable);
@@ -91,12 +84,27 @@ public class BluetoothConnection implements Connection {
         }
 
         try {
+            System.out.println("Connecting...");
             btSocket.connect();
+            System.out.println("About to send...");
+            Message msg = mainHandler.obtainMessage();
+            System.out.println("Getting message...");
+            Bundle bundle = new Bundle();
+            bundle.putString("type", "Connected");
+            bundle.putString("connection", "Bluetooth");
+            msg.setData(bundle);
+            mainHandler.sendMessage(msg);
             System.out.println("Connection established and data link opened...");
         } catch (IOException e) {
             System.out.println("Creating socket: " + e.getMessage());
         }
         sendToServer();
+    }
+
+    public void setDevice (BluetoothDevice _device) {
+        serverDevice = _device;
+        System.out.println("Device name: " + serverDevice.getName());
+        System.out.println("Address: " + serverDevice.getAddress().toString());
     }
 
     public void sendToServer() {
