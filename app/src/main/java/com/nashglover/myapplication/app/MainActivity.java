@@ -1,5 +1,7 @@
 package com.nashglover.myapplication.app;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -205,6 +207,26 @@ public class MainActivity extends ActionBarActivity {
                 endLogButton.setEnabled(false);
             }
         });
+    }
+
+    public void chooseDevice(View view) {
+        final AlertDialog.Builder menuAlert = new AlertDialog.Builder(this);
+        final String[] menuList = { "function1", "function2" };
+        menuAlert.setTitle("list dialog");
+        menuAlert.setItems(menuList,new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                switch (item) {
+                    case 0:
+                        // function 1 code here
+                        break;
+                    case 1:
+                        // function 2 code here
+                        break;
+                }
+            }
+        });
+        AlertDialog menuDrop = menuAlert.create();
+        menuDrop.show();
     }
 
     public void connectClick(View view) throws InterruptedException

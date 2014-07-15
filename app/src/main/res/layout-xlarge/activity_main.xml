@@ -7,7 +7,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_weight="9"
+        android:layout_weight="10"
         android:layout_height="0dp">
         <ScrollView android:id="@+id/log_scroll"
             android:layout_width="match_parent"
@@ -32,9 +32,10 @@
         android:layout_height="0dp">
         <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/connect_group"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_gravity="center">
             <RadioButton android:id="@+id/radio_bluetooth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -46,6 +47,14 @@
                 android:text="@string/radio_wifi"
                 android:onClick="onRadioButtonClicked"/>
         </RadioGroup>
+        <View android:layout_height="fill_parent"
+            android:layout_width="80px" />
+        <Button
+            android:id="@+id/choose_device_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/choose_device_button"
+            android:onClick="chooseDevice"/>
         </LinearLayout>
 
     <LinearLayout

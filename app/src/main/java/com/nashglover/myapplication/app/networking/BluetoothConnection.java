@@ -57,10 +57,10 @@ public class BluetoothConnection implements Connection {
                     // Loop through paired devices
                     for (BluetoothDevice device : pairedDevices) {
                         System.out.println(device.getName());
-                        //if (device.getName().equals("IMAGING078")) {
+                        if (device.getName().equals("IMAGING078")) {
                         //if (device.getName().equals("MicroSoft-PC")){
                         //if (device.getName().equals("NASH-PC")) {
-                        if (device.getName().equals("IMAGING176")) {
+                        //if (device.getName().equals("IMAGING176")) {
                             System.out.println("Setting the device up.");
                             serverDevice = device;
                             break;
