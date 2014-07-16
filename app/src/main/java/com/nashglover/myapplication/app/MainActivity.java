@@ -45,7 +45,7 @@ public class MainActivity extends ActionBarActivity {
     AtomicBoolean tracking = new AtomicBoolean();
     Boolean connecting;
     Boolean bluetooth = true;
-
+    Boolean first = true;
     NetworkConnection network;
 
     LoggingThread logThread = null;
@@ -86,6 +86,28 @@ public class MainActivity extends ActionBarActivity {
                 disconnectButton.setEnabled(false);
                 count++;
             }
+            else if (type.equals("Connection Failed")) {
+                String networkType = bundle.getString("connection");
+                if (networkType.equals("Bluetooth")) {
+                    disconnectButton.setEnabled(false);
+                    connectButton.setEnabled(true);
+
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                    alertDialogBuilder
+                            .setMessage("Could not connect to device.")
+                            .setCancelable(false)
+                            .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,int id) {
+                                    dialog.cancel();
+                                }
+                            });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    (findViewById(R.id.radio_bluetooth)).setEnabled(true);
+                    (findViewById(R.id.radio_wifi)).setEnabled(true);
+                    logText.append(String.format("Could not connect%n"));
+                }
+            }
             else if (type.equals("Logging")) {
                 startLogButton.setEnabled(false);
                 endLogButton.setEnabled(true);
@@ -121,7 +143,14 @@ public class MainActivity extends ActionBarActivity {
             startLogButton.setEnabled(savedInstanceState.getBoolean("startLogState"));
             endLogButton.setEnabled(savedInstanceState.getBoolean("endLogState"));
             saveButton.setEnabled(savedInstanceState.getBoolean("saveState"));
+        } else if (savedInstanceState == null && first) {
+            connectButton.setEnabled(true);
+            disconnectButton.setEnabled(false);
+            startLogButton.setEnabled(false);
+            endLogButton.setEnabled(false);
+            saveButton.setEnabled(false);
         }
+        first = false;
     }
 
     @Override
@@ -283,7 +312,12 @@ public class MainActivity extends ActionBarActivity {
 
     public void startLogging(View view)
     {
-        logThread.startLogging();
+        if (bluetooth) {
+            bluetoothNetwork.startLogging();
+        }
+        else {
+            logThread.startLogging();
+        }
     }
 
 }

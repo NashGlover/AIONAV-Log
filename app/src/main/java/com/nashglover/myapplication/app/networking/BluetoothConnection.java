@@ -19,6 +19,7 @@ import java.util.UUID;
 public class BluetoothConnection implements Connection {
 
     public BluetoothLogging logThread;
+    private Thread loggingThread;
     ArrayList<BluetoothAdapter> adapterArray;
     private BluetoothAdapter adapter = null;
     private BluetoothDevice serverDevice = null;
@@ -52,21 +53,6 @@ public class BluetoothConnection implements Connection {
                     System.out.println("It's enabled!");
                 }
 
-                /*Set<BluetoothDevice> pairedDevices = adapter.getBondedDevices();
-                if (pairedDevices.size() > 0) {
-                    // Loop through paired devices
-                    for (BluetoothDevice device : pairedDevices) {
-                        System.out.println(device.getName());
-                        if (device.getName().equals("IMAGING078")) {
-                        //if (device.getName().equals("MicroSoft-PC")){
-                        //if (device.getName().equals("NASH-PC")) {
-                        //if (device.getName().equals("IMAGING176")) {
-                            System.out.println("Setting the device up.");
-                            serverDevice = device;
-                            break;
-                        }
-                    }
-                }*/
                 System.out.println("Device: " + serverDevice.getName());
                 connectToServer();
             }
@@ -79,11 +65,6 @@ public class BluetoothConnection implements Connection {
         try {
             btSocket = serverDevice.createRfcommSocketToServiceRecord(MY_UUID);
             System.out.println("Created the socket worked.");
-        } catch (IOException e) {
-            System.out.println("From starting client: " + e.getMessage());
-        }
-
-        try {
             System.out.println("Connecting...");
             btSocket.connect();
             System.out.println("About to send...");
@@ -95,10 +76,17 @@ public class BluetoothConnection implements Connection {
             msg.setData(bundle);
             mainHandler.sendMessage(msg);
             System.out.println("Connection established and data link opened...");
+            sendToServer();
         } catch (IOException e) {
-            System.out.println("Creating socket: " + e.getMessage());
+            System.out.println("From starting client: " + e.getMessage());
+            Message msg = mainHandler.obtainMessage();
+            System.out.println("Getting message...");
+            Bundle bundle = new Bundle();
+            bundle.putString("type", "Connection Failed");
+            bundle.putString("connection", "Bluetooth");
+            msg.setData(bundle);
+            mainHandler.sendMessage(msg);
         }
-        sendToServer();
     }
 
     public void setDevice (BluetoothDevice _device) {
@@ -117,7 +105,8 @@ public class BluetoothConnection implements Connection {
 
     public void startLogging() {
         logThread = new BluetoothLogging(this, this.btSocket, mainHandler);
-        (new Thread(logThread)).start();
+        loggingThread = new Thread(logThread);
+        loggingThread.start();
     }
 
     public void stopLogging() {
@@ -130,18 +119,14 @@ public class BluetoothConnection implements Connection {
         stopLogging();
         Runnable disconnect = new Runnable() {
             public void run() {
-                synchronized(BluetoothConnection.this) {
-                    try {
-                        if (!flag) {
-                            BluetoothConnection.this.wait();
-                            btSocket.close();
-                        }
-                    } catch (IOException e) {
-                        System.out.println("Error closing Bluetooth socket: " + e.getMessage());
-                    } catch (InterruptedException e) {
-                        System.out.println(e.getMessage());
-                    }
-                }
+                try{
+                    loggingThread.join();
+                    btSocket.close();
+               } catch (IOException e) {
+                    System.out.println("Error closing Bluetooth socket: " + e.getMessage());
+               } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
+               }
             }
         };
         Thread disconnectThread = new Thread(disconnect);
