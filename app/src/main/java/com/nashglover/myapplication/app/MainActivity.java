@@ -42,6 +42,10 @@ public class MainActivity extends ActionBarActivity {
     Button endLogButton;
     Button connectButton;
 
+    TextView deviceName;
+
+    BluetoothDevice currentDevice = null;
+
     AtomicBoolean tracking = new AtomicBoolean();
     Boolean connecting;
     Boolean bluetooth = true;
@@ -135,6 +139,7 @@ public class MainActivity extends ActionBarActivity {
         endLogButton = (Button) findViewById(R.id.end_log_button);
         logText = (TextView) findViewById(R.id.log_message);
         logScroll = (ScrollView) findViewById(R.id.log_scroll);
+        deviceName = (TextView) findViewById(R.id.device_name);
 
         if (savedInstanceState != null) {
             logText.setText(savedInstanceState.getString("logtext"));
@@ -158,6 +163,11 @@ public class MainActivity extends ActionBarActivity {
         super.onStop();
 
         System.out.println("Activity has been stopped!");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -265,6 +275,8 @@ public class MainActivity extends ActionBarActivity {
                             public void onClick(DialogInterface dialog, int item) {
                                 System.out.println("Clicked!");
                                 bluetoothNetwork.setDevice(devices[item]);
+                                currentDevice = devices[item];
+
                             }
                         });
                         final AlertDialog menuDrop = menuAlert.create();

@@ -16,5 +16,7 @@
     <string name="radio_bluetooth">Bluetooth</string>
     <string name="radio_wifi">WiFi</string>
     <string name="choose_device_button">Choose Device</string>
+    <string name="current_connection">Connected to: </string>
+    <string name="none"> None</string>
 
 </resources>
